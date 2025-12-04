@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Calculadora de Lasaña de Lucian</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #ff9a9e, #fecfef);
+        }
+
+        .contenedor {
+            background: #ffffff;
+            width: 90%;
+            max-width: 600px;
+            padding: 25px 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            color: #e63946;
+        }
+
+        .subtitulo {
+            margin-bottom: 15px;
+            color: #6d6875;
+        }
+
+        button {
+            margin: 15px 0 20px;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 999px;
+            font-size: 1rem;
+            cursor: pointer;
+            background: #e63946;
+            color: #ffffff;
+            font-weight: 600;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+            background: #d62839;
+        }
+
+        #mensajes {
+            font-weight: 600;
+            color: #6d6875;
+            margin-bottom: 10px;
+            min-height: 20px;
+        }
+
+        .resultados {
+            background: #fff5f7;
+            border-radius: 12px;
+            padding: 15px 20px;
+            text-align: left;
+        }
+
+        .resultados h2 {
+            margin-bottom: 8px;
+            color: #c1121f;
+        }
+
+        .resultados p {
+            margin-bottom: 6px;
+            color: #333333;
+        }
+
+        .nota {
+            margin-top: 12px;
+            font-size: 0.9rem;
+            color: #6d6875;
+        }
+    </style>
+</head>
+<body>
+    <div class="contenedor">
+        <h1>Calculadora de Lasaña de Lucian</h1>
+        <p class="subtitulo">
+            Haz clic en el botón para ingresar las capas y el tiempo en el horno,
+            y te diremos cuánto falta para que tu lasaña de San Valentín esté lista. 💘
+        </p>
+
+        <button onclick="pedirDatos()">Calcular tiempos</button>
+
+        <div id="mensajes"></div>
+
+        <div class="resultados">
+            <h2>Resultados</h2>
+            <p id="restante"></p>
+            <p id="preparacion"></p>
+            <p id="total"></p>
+        </div>
+
+        <p class="nota">
+            Tiempo estándar en el horno: <strong>40 minutos</strong>.  
+            Cada capa de lasaña tarda <strong>2 minutos</strong> en prepararse.
+        </p>
+    </div>
+
+    <script>
+        const TIEMPO_HORNO = 40;
+        const TIEMPO_PREPARACION_POR_CAPA = 2;
+        function calcularTiempoRestante(minutosEnHorno) {
+            const restante = TIEMPO_HORNO - minutosEnHorno;
+            return restante > 0 ? restante : 0;
+        }
+
+        function calcularTiempoPreparacion(numeroCapas) {
+            return numeroCapas * TIEMPO_PREPARACION_POR_CAPA;
+        }
+
+        function calcularTiempoTotalTrabajo(minutosEnHorno, minutosPreparacion) {
+            return minutosEnHorno + minutosPreparacion;
+        }
+
+        function pedirDatos() {
+            const mensajes = document.getElementById("mensajes");
+            const pRestante = document.getElementById("restante");
+            const pPrep = document.getElementById("preparacion");
+            const pTotal = document.getElementById("total");
+
+            mensajes.textContent = "";
+            pRestante.textContent = "";
+            pPrep.textContent = "";
+            pTotal.textContent = "";
+
+            const capasTexto = prompt("¿Cuántas capas tiene tu lasaña?");
+            const hornoTexto = prompt("¿Cuántos minutos lleva la lasaña en el horno?");
+
+            if (capasTexto === null || hornoTexto === null) {
+                mensajes.textContent = "Has cancelado la operación. Pulsa el botón de nuevo si deseas calcular los tiempos.";
+                return;
+            }
+
+            const numeroCapas = parseInt(capasTexto);
+            const minutosEnHorno = parseInt(hornoTexto);
+
+            if (
+                isNaN(numeroCapas) || isNaN(minutosEnHorno) ||
+                numeroCapas < 0 || minutosEnHorno < 0
+            ) {
+                mensajes.textContent = "Por favor, ingresa solo números mayores o iguales a cero para las capas y los minutos en el horno.";
+                return;
+            }
+
+            const tiempoPreparacion = calcularTiempoPreparacion(numeroCapas);
+            const tiempoRestanteBruto = TIEMPO_HORNO - minutosEnHorno;
+            const tiempoRestante = calcularTiempoRestante(minutosEnHorno);
+            const tiempoTotalTrabajo = calcularTiempoTotalTrabajo(minutosEnHorno, tiempoPreparacion);
+
+            if (tiempoRestanteBruto > 0) {
+                pRestante.textContent = `Tiempo restante en el horno: ${tiempoRestante} minuto(s).`;
+            } else if (tiempoRestanteBruto === 0) {
+                pRestante.textContent = "¡La lasaña ya ha alcanzado el tiempo perfecto de horno (40 minutos)! 💖";
+            } else {
+                pRestante.textContent = "La lasaña ya ha superado el tiempo estándar de horno (40 minutos). Vigílala para que no se queme. 🔥";
+            }
+
+            pPrep.textContent = `Tiempo total de preparación: ${tiempoPreparacion} minuto(s) para ${numeroCapas} capa(s).`;
+
+            pTotal.textContent = `Tiempo total de trabajo (preparación + tiempo en el horno hasta ahora): ${tiempoTotalTrabajo} minuto(s).`;
+
+            mensajes.textContent = "¡Listo! Estos son los tiempos para tu lasaña de San Valentín. 😍";
+        }
+    </script>
+</body>
+</html>
